@@ -3,4 +3,4 @@ On project start a local swagger should display in your browser where you can te
 Alternatively use postman or powershell to query the endpoint
 For basic pokemon the endpoint is http GET https://localhost:portnumber/pokemon/{pokemonName}
 
-For translated pokemon the endpoint is http GET https://localhost:portnumber/translated/{pokemonName}
+For translated pokemon the endpoint is http GET https://localhost:portnumber/translated/{pokemonName}.
