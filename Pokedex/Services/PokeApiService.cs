@@ -16,7 +16,7 @@ public class PokeApiService:IPokeApiService
     
     public async Task<PokemonResponse> GetTranslatedPokemon(string pokemonName, CancellationToken cancellationToken)
     {
-        var pokemon = await _apiClient.GetResourceAsync<PokemonTranslated>(_basePokeApiUri, pokemonName, cancellationToken);
+        var pokemon = await _apiClient.GetResourceAsync<Pokemon>(_basePokeApiUri, pokemonName, cancellationToken);
         if (pokemon == null)
         {
             return null;
@@ -40,7 +40,7 @@ public class PokeApiService:IPokeApiService
 
     public async Task<PokemonResponse> GetBasicPokemon(string pokemonName, CancellationToken cancellationToken)
     {
-        var pokemon = await _apiClient.GetResourceAsync<PokemonBasic>(_basePokeApiUri, pokemonName, cancellationToken);
+        var pokemon = await _apiClient.GetResourceAsync<Pokemon>(_basePokeApiUri, pokemonName, cancellationToken);
         if (pokemon == null)
         {
             return null;

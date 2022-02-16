@@ -11,13 +11,3 @@ public class Pokemon
     [JsonPropertyName("flavor_text_entries")]  
     public PokemonDescription[] PokemonDescriptions { get; set; }
 }
-
-public class PokemonTranslated : Pokemon
-{
-    public PokemonDescription TranslatedDescription { get; set; }
-}
-
-public class PokemonBasic : Pokemon
-{
-    public PokemonDescription StandardDescription { get; set; }
-}

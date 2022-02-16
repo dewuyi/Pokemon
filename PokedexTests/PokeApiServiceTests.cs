@@ -22,10 +22,7 @@ public class PokeApiServiceTests
         _fixture = new Fixture();
         _fixture.Customize(new AutoMoqCustomization());
         _mockApiClient = _fixture.Freeze<Mock<IApiClient>>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonBasic>(_basePokeApiUri,
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetBasicPokemon()));
-        
+      
         _mockApiClient.Setup(api => api.GetResourceAsync<PokemonTranslatedDescription>(_baseShakespeareTranslationUri,
             It.IsAny<string>(),
             It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemonTranslation(isYodaTranslation:false)));
@@ -38,24 +35,25 @@ public class PokeApiServiceTests
     public async Task GetBasicPokemon_ReturnsBasicPokemon()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
+        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+            "caterpie",
+            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p=>p.Name=="caterpie")));
 
         var description =
             "Forms colonies in\nperpetually dark\nplaces. Uses\fultrasonic waves\nto identify and\napproach targets.";
-        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonBasic>(It.IsAny<Uri>(),
-            It.IsAny<string>(),
-            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetBasicPokemon()));
-        var result = await pokeApiService.GetBasicPokemon("zubat", CancellationToken.None);
+       
+        var result = await pokeApiService.GetBasicPokemon("caterpie", CancellationToken.None);
         
         Assert.AreEqual(result.Description, description);
     }
     
     [Test]
-    public async Task GetBasicPokemon_ReturnsTranslatedPokemonYoda()
+    public async Task GetTranslatedPokemon_ReturnsTranslatedPokemonYoda()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonTranslated>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
             It.IsAny<string>(),
-            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetTranslatedPokemons().First()));
+            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p=>p.Name=="zubat")));
         
         var description =
             "Lost a planet,  master obiwan has.";
@@ -64,14 +62,32 @@ public class PokeApiServiceTests
         
         Assert.AreEqual(result.Description, description);
     }
-    
+
     [Test]
-    public async Task GetBasicPokemon_ReturnsTranslatedPokemonShakesphere()
+    public async Task GetTranslatedPokemon_LegendaryPokemonReturnsTranslatedPokemonYoda()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonTranslated>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
             It.IsAny<string>(),
-            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetTranslatedPokemons().Last()));
+            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p => p.Name== "squirtle")));
+        var description =
+            "Lost a planet,  master obiwan has.";
+        
+        var result = await pokeApiService.GetTranslatedPokemon("squirtle", CancellationToken.None);
+        
+        Assert.AreEqual(result.Description, description);
+    }
+    
+   
+    
+    
+    [Test]
+    public async Task GetTranslatedPokemon_ReturnsTranslatedPokemonShakesphere()
+    {
+        var pokeApiService = _fixture.Create<PokeApiService>();
+        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+            It.IsAny<string>(),
+            It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p => p.Name == "charmander")));
         var description =
             "Master obiwan hath did lose a planet.";
         
@@ -81,48 +97,44 @@ public class PokeApiServiceTests
     }
     
     
-    private PokemonBasic GetBasicPokemon()
-    {
-        var pokemon = new PokemonBasic
-        {
-            Name = "zubat",
-            Habitat = new ResponseItem()
-            {
-                Name = "cave"
-            },
-            IsLegendary = false,
-            PokemonDescriptions = new PokemonDescription[]
-            {
-                new()
-                {
-                    Language = new ResponseItem()
-                    {
-                        Name = "fr"
-                    },
-                    Description =
-                        "Il se repère dans l’espace grâce\naux ultrasons émis par sa gueule."
-
-                },
-                new()
-                {
-                    Language = new ResponseItem()
-                    {
-                        Name = "en"
-                    },
-                    Description =
-                        "Forms colonies in\nperpetually dark\nplaces. Uses\fultrasonic waves\nto identify and\napproach targets."
-
-                }
-            }
-        };
-        
-        return pokemon;
-    }
     
-    private  IEnumerable<PokemonTranslated> GetTranslatedPokemons()
+    
+    private  IEnumerable<Pokemon> GetPokemons()
     {
-        var pokemons = new List<PokemonTranslated>
+        var pokemons = new List<Pokemon>
         {
+            new()
+            {
+                Name = "caterpie",
+                Habitat = new ResponseItem()
+                {
+                    Name = "forest"
+                },
+                IsLegendary = false,
+                PokemonDescriptions = new PokemonDescription[]
+                {
+                    new()
+                    {
+                        Language = new ResponseItem()
+                        {
+                            Name = "fr"
+                        },
+                        Description =
+                            "Il se repère dans l’espace grâce\naux ultrasons émis par sa gueule."
+
+                    },
+                    new()
+                    {
+                        Language = new ResponseItem()
+                        {
+                            Name = "en"
+                        },
+                        Description =
+                            "Forms colonies in\nperpetually dark\nplaces. Uses\fultrasonic waves\nto identify and\napproach targets."
+
+                    }
+                }
+            },
             new()
             {
                 Name = "zubat",
@@ -163,6 +175,38 @@ public class PokeApiServiceTests
                     Name = "mountain"
                 },
                 IsLegendary = false,
+                PokemonDescriptions = new PokemonDescription[]
+                {
+                    new()
+                    {
+                        Language = new ResponseItem()
+                        {
+                            Name = "fr"
+                        },
+                        Description =
+                            "Maître Obiwan a perdu une planète."
+
+                    },
+                    new()
+                    {
+                        Language = new ResponseItem()
+                        {
+                            Name = "en"
+                        },
+                        Description =
+                            "Master Obiwan has lost a planet."
+
+                    }
+                }
+            },
+            new()
+            {
+                Name = "squirtle",
+                Habitat = new ResponseItem()
+                {
+                    Name = "waters-edge"
+                },
+                IsLegendary = true,
                 PokemonDescriptions = new PokemonDescription[]
                 {
                     new()
