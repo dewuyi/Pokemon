@@ -49,11 +49,4 @@ public class ApiClient:IApiClient
             responseStream, SerializerOptions, cancellationToken);
     }
     
-   
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-    
 }

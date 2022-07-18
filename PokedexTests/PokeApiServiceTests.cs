@@ -35,7 +35,7 @@ public class PokeApiServiceTests
     public async Task GetBasicPokemon_ReturnsBasicPokemon()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonResponse>(_basePokeApiUri,
             "caterpie",
             It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p=>p.Name=="caterpie")));
 
@@ -51,7 +51,7 @@ public class PokeApiServiceTests
     public async Task GetTranslatedPokemon_ReturnsTranslatedPokemonYoda()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonResponse>(_basePokeApiUri,
             It.IsAny<string>(),
             It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p=>p.Name=="zubat")));
         
@@ -67,7 +67,7 @@ public class PokeApiServiceTests
     public async Task GetTranslatedPokemon_LegendaryPokemonReturnsTranslatedPokemonYoda()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonResponse>(_basePokeApiUri,
             It.IsAny<string>(),
             It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p => p.Name== "squirtle")));
         var description =
@@ -85,7 +85,7 @@ public class PokeApiServiceTests
     public async Task GetTranslatedPokemon_ReturnsTranslatedPokemonShakesphere()
     {
         var pokeApiService = _fixture.Create<PokeApiService>();
-        _mockApiClient.Setup(api => api.GetResourceAsync<Pokemon>(_basePokeApiUri,
+        _mockApiClient.Setup(api => api.GetResourceAsync<PokemonResponse>(_basePokeApiUri,
             It.IsAny<string>(),
             It.IsAny<CancellationToken>())).Returns(Task.FromResult(GetPokemons().First(p => p.Name == "charmander")));
         var description =
@@ -99,9 +99,9 @@ public class PokeApiServiceTests
     
     
     
-    private  IEnumerable<Pokemon> GetPokemons()
+    private  IEnumerable<PokemonResponse> GetPokemons()
     {
-        var pokemons = new List<Pokemon>
+        var pokemons = new List<PokemonResponse>
         {
             new()
             {

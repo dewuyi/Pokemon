@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Pokedex.Model;
 
 namespace Pokedex.Services;
@@ -5,6 +6,7 @@ namespace Pokedex.Services;
 public class PokeApiService:IPokeApiService
 {
     private IApiClient _apiClient;
+    private readonly ConcurrentDictionary<string, PokemonResponse> _cachedPokemon = new();
     public PokeApiService(IApiClient apiClient)
     {
         _apiClient = apiClient;
@@ -14,15 +16,26 @@ public class PokeApiService:IPokeApiService
     private readonly Uri _baseShakespeareTranslationUri = new Uri("https://api.funtranslations.com/translate/shakespeare.json");
     private readonly Uri _baseYodaTranslationUri = new Uri("https://api.funtranslations.com/translate/yoda.json");
     
-    public async Task<PokemonResponse> GetTranslatedPokemon(string pokemonName, CancellationToken cancellationToken)
+    public async Task<Pokemon> GetTranslatedPokemon(string pokemonName, CancellationToken cancellationToken)
     {
-        var pokemon = await _apiClient.GetResourceAsync<Pokemon>(_basePokeApiUri, pokemonName, cancellationToken);
+        PokemonResponse pokemon;
+
+        if (_cachedPokemon.TryGetValue(pokemonName, out var cachedPokemon))
+        {
+            pokemon = cachedPokemon;
+        }
+        else
+        {
+            pokemon = await _apiClient.GetResourceAsync<PokemonResponse>(_basePokeApiUri, pokemonName, cancellationToken);
+            _cachedPokemon[pokemon.Name] = pokemon;
+        }
+        
         if (pokemon == null)
         {
             return null;
         }
         
-        var response = new PokemonResponse
+        var response = new Pokemon
         {
             Name = pokemon.Name,
             Description = pokemon.PokemonDescriptions.First(d => d.Language.Name == "en").Description,
@@ -38,15 +51,25 @@ public class PokeApiService:IPokeApiService
         return response;
     }
 
-    public async Task<PokemonResponse> GetBasicPokemon(string pokemonName, CancellationToken cancellationToken)
+    public async Task<Pokemon> GetBasicPokemon(string pokemonName, CancellationToken cancellationToken)
     {
-        var pokemon = await _apiClient.GetResourceAsync<Pokemon>(_basePokeApiUri, pokemonName, cancellationToken);
+        PokemonResponse pokemon;
+        if (_cachedPokemon.TryGetValue(pokemonName, out var cachedPokemon))
+        {
+            pokemon = cachedPokemon;
+        }
+        else
+        {
+            pokemon = await _apiClient.GetResourceAsync<PokemonResponse>(_basePokeApiUri, pokemonName, cancellationToken);
+        }
+       
+       
         if (pokemon == null)
         {
             return null;
         }
         
-        var response = new PokemonResponse
+        var response = new Pokemon
         {
             Name = pokemon.Name,
             Description = pokemon.PokemonDescriptions.First(d => d.Language.Name == "en").Description,
@@ -57,7 +80,7 @@ public class PokeApiService:IPokeApiService
         return response;
     }
 
-    private Uri GetPokemonTranslationUri(PokemonResponse pokemon)
+    private Uri GetPokemonTranslationUri(Pokemon pokemon)
     {
         if (pokemon.Habitat == "cave" || pokemon.IsLegendary)
         {

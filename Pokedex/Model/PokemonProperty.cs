@@ -10,9 +10,5 @@ public class ResponseItem
     /// </summary>
     public string Name { get; set; }
     
-    /// <summary>
-    /// The api url of the pokemon property
-    /// </summary>
-    public string Url { get; set; }
 }
 

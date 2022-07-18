@@ -4,10 +4,10 @@ namespace Pokedex.Services;
 
 public interface IPokeApiService
 {
-    Task<PokemonResponse> GetTranslatedPokemon(string pokemonName,
+    Task<Pokemon> GetTranslatedPokemon(string pokemonName,
         CancellationToken cancellationToken);
 
-    Task<PokemonResponse> GetBasicPokemon(
+    Task<Pokemon> GetBasicPokemon(
         string pokemonName,
         CancellationToken cancellationToken);
 }

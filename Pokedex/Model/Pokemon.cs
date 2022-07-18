@@ -1,13 +1,11 @@
-using System.Text.Json.Serialization;
-
 namespace Pokedex.Model;
 
 public class Pokemon
 {
+    public int PokemonId { get; set; }
     public string Name { get; set; }
-    public ResponseItem Habitat { get; set; }
+    public string Habitat { get; set; }
     public bool IsLegendary { get; set; }
-    
-    [JsonPropertyName("flavor_text_entries")]  
-    public PokemonDescription[] PokemonDescriptions { get; set; }
+    public string Description { get; set; }
+    public DateTime? LastTranslated { get; set; }
 }
